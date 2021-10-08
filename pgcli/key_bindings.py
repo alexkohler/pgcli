@@ -1,4 +1,6 @@
 import logging
+import subprocess
+import os
 from prompt_toolkit.enums import EditingMode
 from prompt_toolkit.key_binding import KeyBindings
 from prompt_toolkit.filters import (
@@ -56,17 +58,41 @@ def pgcli_bindings(pgcli):
         else:
             buff.insert_text(tab_insert_text, fire_event=False)
 
+    # tmux bindings: note - you'll see odd behavior if
+    # running pgcli outside of a tmux session
+    @kb.add("c-l", filter=completion_is_selected)
+    def _(event):
+        _logger.error("c-l 1")
+        event.current_buffer.complete_state = None
+        event.app.current_buffer.complete_state = None
+
+    @kb.add("c-l", filter=~completion_is_selected)
+    def _(event):
+        _logger.error("c-l 2")
+        subprocess.run(["tmux", "select-pane", "-R"])
+
+    # note: ctrl-h is unbound because of issues with backspace
+    # @kb.add("c-h")
+    # def _(event):
+    #     _logger.error("c-h")
+    # subprocess.run(["tmux", "select-pane", "-R"])
+
     @kb.add("c-j")
     def _(event):
+        _logger.error("c-j")
         b = event.app.current_buffer
         if b.complete_state:
             b.complete_next()
+        else:
+            subprocess.run(["tmux", "select-pane", "-D"])
 
     @kb.add("c-k")
     def _(event):
         b = event.app.current_buffer
         if b.complete_state:
             b.complete_previous()
+        else:
+            subprocess.run(["tmux", "select-pane", "-U"])
 
     @kb.add("escape", filter=has_completions)
     def _(event):
