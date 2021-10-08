@@ -56,6 +56,18 @@ def pgcli_bindings(pgcli):
         else:
             buff.insert_text(tab_insert_text, fire_event=False)
 
+    @kb.add("c-j")
+    def _(event):
+        b = event.app.current_buffer
+        if b.complete_state:
+            b.complete_next()
+
+    @kb.add("c-k")
+    def _(event):
+        b = event.app.current_buffer
+        if b.complete_state:
+            b.complete_previous()
+
     @kb.add("escape", filter=has_completions)
     def _(event):
         """Force closing of autocompletion."""
@@ -64,7 +76,7 @@ def pgcli_bindings(pgcli):
         event.current_buffer.complete_state = None
         event.app.current_buffer.complete_state = None
 
-    @kb.add("c-space")
+    @kb.add("c-space", "c-f")
     def _(event):
         """
         Initialize autocompletion at cursor.
