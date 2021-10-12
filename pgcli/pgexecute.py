@@ -1,3 +1,4 @@
+import os
 import logging
 import select
 import traceback
@@ -421,6 +422,9 @@ class PGExecute:
                  (title, rows, headers, status, query, success, is_special)
         """
 
+        _logger.error("@@@@@@@@@ starting query")
+        with open("/tmp/pgclilock", "w+") as fp:
+            pass
         # Remove spaces and EOL
         statement = statement.strip()
         if not statement:  # Empty string
@@ -485,6 +489,9 @@ class PGExecute:
                 if self.reset_expanded:
                     pgspecial.expanded_output = False
                     self.reset_expanded = None
+
+        os.remove("/tmp/pgclilock")
+        _logger.error("@@@@@@@@@ done running query and removed")
 
     def _must_raise(self, e):
         """Return true if e is an error that should not be caught in ``run``.

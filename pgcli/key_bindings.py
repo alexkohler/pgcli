@@ -22,6 +22,19 @@ def pgcli_bindings(pgcli):
 
     tab_insert_text = " " * 4
 
+    @kb.add("f1")
+    def _(event):
+        """force remove the lock file to unblock any tmux stuff"""
+        _logger.debug("Detected F1 key.")
+        p = "/tmp/pgclilock"
+        if os.path.isfile(p):
+            _logger.error("removing lock")
+            os.remove("/tmp/pgclilock")
+        else:
+            _logger.error("creating lock")
+            with open("/tmp/pgclilock", "w+") as fp:
+                pass
+
     @kb.add("f2")
     def _(event):
         """Enable/Disable SmartCompletion Mode."""
@@ -71,20 +84,27 @@ def pgcli_bindings(pgcli):
         _logger.error("c-l 2")
         subprocess.run(["tmux", "select-pane", "-R"])
 
-    # note: ctrl-h is unbound because of issues with backspace
+    # note: ctrl-h is unbound because of issues with backspace, but we could potentially fix
+    # this with https://github.com/prompt-toolkit/python-prompt-toolkit/pull/1384/files
     # @kb.add("c-h")
     # def _(event):
+    #     buff = event.app.current_buffer
+    #     doc = buff.document
     #     _logger.error("c-h")
-    # subprocess.run(["tmux", "select-pane", "-R"])
+    #     if not doc.current_line.strip():
+    #         subprocess.run(["tmux", "select-pane", "-L"])
+    #     else:
+    #         doc.current_line = doc.current_line[:-1]
 
     @kb.add("c-j")
     def _(event):
-        _logger.error("c-j")
+        # _logger.error("c-j")
         b = event.app.current_buffer
         if b.complete_state:
             b.complete_next()
         else:
             subprocess.run(["tmux", "select-pane", "-D"])
+        _logger.error("c-j after")
 
     @kb.add("c-k")
     def _(event):
