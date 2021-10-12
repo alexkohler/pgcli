@@ -1,5 +1,6 @@
 from pkg_resources import packaging
 
+import os
 import prompt_toolkit
 from prompt_toolkit.key_binding.vi_state import InputMode
 from prompt_toolkit.application import get_app
@@ -51,6 +52,12 @@ def create_toolbar_tokens_func(pgcli):
             )
         else:
             result.append(("class:bottom-toolbar", "[F4] Emacs-mode"))
+
+        p = "/tmp/pgclilock"
+        if os.path.isfile(p):
+            result.append(("class:bottom-toolbar.on", " Tmux bindings: ON"))
+        else:
+            result.append(("class:bottom-toolbar.off", " Tmux bindings: OFF"))
 
         if pgcli.pgexecute.failed_transaction():
             result.append(
