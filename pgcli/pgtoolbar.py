@@ -28,6 +28,12 @@ def create_toolbar_tokens_func(pgcli):
         result = []
         result.append(("class:bottom-toolbar", " "))
 
+        p = "/tmp/pgclilock"
+        if os.path.isfile(p):
+            result.append(("class:bottom-toolbar.on", " [F1] Tmux bindings: ON  "))
+        else:
+            result.append(("class:bottom-toolbar.off", " [F1] Tmux bindings: OFF  "))
+
         if pgcli.completer.smart_completion:
             result.append(("class:bottom-toolbar.on", "[F2] Smart Completion: ON  "))
         else:
@@ -52,12 +58,6 @@ def create_toolbar_tokens_func(pgcli):
             )
         else:
             result.append(("class:bottom-toolbar", "[F4] Emacs-mode"))
-
-        p = "/tmp/pgclilock"
-        if os.path.isfile(p):
-            result.append(("class:bottom-toolbar.on", " Tmux bindings: ON"))
-        else:
-            result.append(("class:bottom-toolbar.off", " Tmux bindings: OFF"))
 
         if pgcli.pgexecute.failed_transaction():
             result.append(
