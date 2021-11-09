@@ -838,6 +838,10 @@ class PGCli:
             continuation = self.multiline_continuation_char * (width - 1) + " "
             return [("class:continuation", continuation)]
 
+        # enable tmux keybindings on startup
+        with open("/tmp/pgclilock", "w+") as fp:
+            pass
+
         get_toolbar_tokens = create_toolbar_tokens_func(self)
 
         if self.wider_completion_menu:
